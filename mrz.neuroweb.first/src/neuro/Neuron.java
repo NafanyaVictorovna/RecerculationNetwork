@@ -95,21 +95,21 @@ public class Neuron {
         }
     }
     
-//    private double alphaX(double[] newX){
-//        double alphaX = 0;
-//        for(int i =0; i<N; i++){
-//            alphaX += Math.pow(newX[i], 2);
-//        }
-//        return alphaX = 1./(alphaX); 
-//    }
-//    
-//    private double alphaY(int p, double[] Y){
-//        double alphaY = 0;
-//        for(int j=0; j<p; j++){
-//            alphaY += Math.pow(Y[j],2);
-//        }
-//        return alphaY = 1./(alphaY);
-//    }
+    private double alphaX(double[] newX){
+        double alphaX = 0;
+        for(int i =0; i<N; i++){
+            alphaX += Math.pow(newX[i], 2);
+        }
+        return alphaX = 1./(alphaX); 
+    }
+    
+    private double alphaY(int p, double[] Y){
+        double alphaY = 0;
+        for(int j=0; j<p; j++){
+            alphaY += Math.pow(Y[j],2);
+        }
+        return alphaY = 1./(alphaY);
+    }
     
     public double error(int p, int s){
         double[] Y, newX, gamma;
@@ -122,9 +122,9 @@ public class Neuron {
         //result X
         this.NewXStage(p, newX, Y);
         //adaptive step for inside layer 
-        //this.alphaY(p,Y);
+        this.alphaY(p,Y);
         //adaptive step for result layer
-        //this.alphaX(newX);
+        this.alphaX(newX);
         //gamma
         for(int j=0; j<p; j++){ 
             g = 0;
@@ -136,12 +136,14 @@ public class Neuron {
         //correct WT, W
         for(int i=0; i<N; i++){
             for(int j=0; j<p; j++){
-                WT[i][j] -= alphaX * X_list[s][i] * gamma[j];
-                W[j][i] -= alphaY * (newX[i] - X_list[s][i]) * Y[j];
+                //change
+                WT[i][j] -= alphaY * X_list[s][i] * gamma[j];
+                W[j][i] -= alphaX * (newX[i] - X_list[s][i]) * Y[j];
             }
         }        
-        this.normalizeW(p);
-        this.normalizeWT(p);       
+//        this.normalizeW(p);
+//        this.normalizeWT(p);  
+        
         //calculation E
         for(int i=0; i<N; i++){
             e += Math.pow((newX[i] - X_list[s][i]), 2);
@@ -151,8 +153,8 @@ public class Neuron {
         return e / 2;
     }
                     
-    public float calcZ(int p){
-        return ((N+L)*p+2)/(N*L);
+    public double calcZ(int p){
+        return ((N+L)*p+2)/((double)(N*L));
     }
     
     public double[] getNewX(int s){
